@@ -44,6 +44,17 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 });
 
+   ///restrictTo function
+   exports.restrictTo=(...roles)=>{
+    return (req,res,next)=>{
+      //role['admin']
+      if(!roles.includes(req.user.roles)){
+        return next(new AppError('You dont have perform for this action',401));}
+      return next();
+    };
+
+   };
+
 //////////////////////////////// SIGN TOKEN
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
