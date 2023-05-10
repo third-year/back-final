@@ -22,11 +22,11 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
     select: false,
   },
-  passwordConfrim: {
+  passwordConfirm: {
     type: String,
     required: true,
 
-    validator: {
+    validate: {
       // This only works on CREATE and SAVE!!!
       validator: function (el) {
         return el === this.password;
@@ -39,6 +39,14 @@ const userSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
+  role:{
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  },
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 userSchema.pre("save", async function (next) {
@@ -49,7 +57,7 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 12);
 
   // Delete passwordConfirm field
-  this.passwordConfrim = undefined;
+  this.passwordConfirm = undefined;
   next();
 });
 
@@ -78,6 +86,18 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   }
   // False means NOT CHANGED
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(3).toString("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+ 
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);
