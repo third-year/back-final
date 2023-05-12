@@ -14,9 +14,12 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "geojson-places": "^1.0.8",
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^2.2.12",
     "mongoose": "^7.1.0",
+    "mongoose-paginate": "^5.0.3",
+    "node-geocoder": "^4.2.0",
     "nodemailer": "^6.9.1",
     "validator": "^13.9.0"
   }
