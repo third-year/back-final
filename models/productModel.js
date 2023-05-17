@@ -25,8 +25,16 @@ const productSchema = mongoose.Schema({
     type: [Number],
     required: [true, "Enter the product address"],
   },
-  rating: {
+  ratingsAverage: {
     type: Number,
+    default: 0,
+    min: [1, 'Rating must be above 1.0'],
+    max: [5, 'Rating must be below 5.0'],
+    set: val => Math.round(val * 10) / 10 // 4.666666, 46.6666, 47, 4.7
+  },
+  ratingsQuantity: {
+    type: Number,
+    default: 0
   },
   categories: {
     type: String,
@@ -41,7 +49,17 @@ const productSchema = mongoose.Schema({
   userId:{
     type: mongoose.Schema.ObjectId,
     ref: 'User'
-  }
+  }},
+  {    
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+// Virtual populate
+productSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'products',
+  localField: '_id'
 });
 
 const Product = mongoose.model('Product', productSchema);

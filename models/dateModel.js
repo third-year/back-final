@@ -1,19 +1,12 @@
 const mongoose = require('mongoose');
 const Review = require('./reviewModel');
-//const Product = require('./productModel');
+const Product = require('./productModel');
 const dateSchema = new mongoose.Schema({
 
     buyDate:{
-        type:dateSchema
+        type:Date
     },
-    reviewDate:{
-        type:dateSchema
-    },
-    reviewId:{
-        Reflect:Review
-    }    
-    /*
     productId:{
-        Reflect:Product
-    }     */    
+        ref:Product
+    }       
 })

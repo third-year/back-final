@@ -18,12 +18,12 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 
 ////////////////////////// GET PRODUCT
 exports.getProduct = catchAsync(async (req, res, next) => {
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id).populate('reviews');
 
   if (!product) {
     return next(new AppError("there is no product with this ID", 404));
   }
-
+  
   res.status(200).json({
     status: "success",
     data: { product },
