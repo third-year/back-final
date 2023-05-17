@@ -1,13 +1,21 @@
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
+const APIFeatures = require("./../utils/apiFeatures");
 const Product = require("./../models/productModel");
 
 ////////////////////////// GET ALL PRODUCT
 exports.getAllProducts = catchAsync(async (req, res, next) => {
-  const products = await Product.find().populate({
-    path: "userId",
-    select: "-__v",
-  });
+  // const products = await Product.find().populate({
+  //   path: "userId",
+  //   select: "-__v",
+  // });
+
+  const features = new APIFeatures(Product.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate(Product);
+  const products = await features.query;
 
   res.status(200).json({
     status: "success",
@@ -58,7 +66,6 @@ exports.updataProduct = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
-
   res.status(200).json({
     status: "success",
     data: product,

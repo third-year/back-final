@@ -12,15 +12,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Enter The Email"],
     validate: [validator.isEmail, "Please provide a valid email"],
-    unique:true    
+    unique: true,
   },
   image: {
     type: String,
   },
-  roles:{
-   type:String,
-   enum:['user','admin'],
-   default:'user'
+  roles: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
   },
   password: {
     type: String,
@@ -45,11 +45,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
-  role:{
-    type: String,
-    enum: ['user', 'admin'],
-    default: 'user'
-  },
+
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
@@ -112,7 +108,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .digest("hex");
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
- 
+
   return resetToken;
 };
 

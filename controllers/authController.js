@@ -6,6 +6,7 @@ const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const sendEmail = require("./../utils/email");
 const User = require("./../models/userModel");
+const Product = require("./../models/productModel");
 
 //////////////////////////////// PROTECT
 exports.protect = catchAsync(async (req, res, next) => {
@@ -46,19 +47,37 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 });
 
-   ///restrictTo function
-   exports.restrictTo = (...roles) => {
-    return (req, res, next) => {
-      // roles ['admin']
-      if (!roles.includes(req.user.role)) {
-        return next(
-          new AppError('You do not have permission to perform this action', 403)
-        );
-      }
-  
-      next();
-    };
+//////////////////////////////// The loged in user is the user who owns the info
+exports.isProductOwner = catchAsync(async (req, res, next) => {
+  const userId = req.user.id;
+
+  const product = await Product.findById(req.params.id);
+
+  if (userId !== product.userId.toString() && req.user.roles === "user") {
+    return next(
+      new AppError(
+        "You are not the owner so you can't perform this action",
+        404
+      )
+    );
+  }
+
+  next();
+});
+
+//////////////////////////////// restrictTo function
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles ['admin']
+    if (!roles.includes(req.user.roles)) {
+      return next(
+        new AppError("You do not have permission to perform this action", 403)
+      );
+    }
+
+    next();
   };
+};
 
 //////////////////////////////// SIGN TOKEN
 const signToken = (id) => {
@@ -66,7 +85,6 @@ const signToken = (id) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
-
 
 //////////////////////////////// CHECK IF THE TOKEN IS VALID
 exports.checkTokenIfValid = catchAsync(async (req, res, next) => {
@@ -89,8 +107,6 @@ exports.checkTokenIfValid = catchAsync(async (req, res, next) => {
   next();
 });
 
-
-
 //////////////////////////////// SIGNUP
 exports.signup = catchAsync(async (req, res, next) => {
   // Check if the email is unique
@@ -109,6 +125,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     fullName: Name,
     email: req.body.email,
     image: req.body.imag,
+    roles: req.body.roles,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     phone: req.body.phone,
@@ -192,7 +209,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-
 //////////////////////////////// CHECK RESET TOKEN
 exports.checkResetToken = catchAsync(async (req, res, next) => {
   res.status(200).json({
@@ -201,9 +217,8 @@ exports.checkResetToken = catchAsync(async (req, res, next) => {
   });
 });
 
-
 //////////////////////////////// RESET PASSWORD
-exports.resetPassword = catchAsync(async(req, res, next)=>{
+exports.resetPassword = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
@@ -216,24 +231,5 @@ exports.resetPassword = catchAsync(async(req, res, next)=>{
      status: 'success',
      massage: 'password reseted successfully'
    })
-});
 
-//updatePassword
- exports.updatePassword = catchAsync(async (req, res, next) => {
-
-  const user = await User.findById(req.user.id).select('+password');
-
-  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
-    return next(new AppError('Your current password is wrong.', 401));
-  }
-
-  user.password = req.body.password;
-  user.passwordConfirm = req.body.passwordConfirm;
-  await user.save();
-
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token
-  });
-});
+})
