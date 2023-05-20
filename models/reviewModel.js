@@ -19,12 +19,17 @@ const reviewSchema = new mongoose.Schema(
       },
       product: {
         type: mongoose.Schema.ObjectId,
-        ref: 'Product'
+        ref: 'Product',
+        required:[true,'Review must belong to a product']
       },
       user: {
         type: mongoose.Schema.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        require:[true,'Review must belong to a user']
       }
+},{
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 reviewSchema.pre(/^find/,function(next){

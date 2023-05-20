@@ -45,6 +45,16 @@ const productSchema = mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'User'
   }
+},{
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Virtual populate
+productSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'product',
+  localField: '_id'
 });
 productSchema.plugin(mongoosePaginate);
 const Product = mongoose.model("Product", productSchema);

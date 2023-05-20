@@ -2,6 +2,7 @@ const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const APIFeatures = require("./../utils/apiFeatures");
 const Product = require("./../models/productModel");
+const Review = require("../models/reviewModel");
 
 ////////////////////////// GET ALL PRODUCT
 exports.getAllProducts = catchAsync(async (req, res, next) => {
