@@ -48,7 +48,7 @@ exports.createProduct = catchAsync(async (req, res, next) => {
     image: req.body.image,
     quantity: req.body.quantity,
     address: req.body.address,
-    categories: req.body.categories,
+    category: req.body.category,
     status: req.body.status,
   });
 

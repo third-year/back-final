@@ -32,7 +32,7 @@ const productSchema = mongoose.Schema(
     rating: {
       type: Number,
     },
-    categories: {
+    category: {
       type: String,
       enum: ["clothes"],
       required: [true, "Enter the product categorie"],

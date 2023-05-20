@@ -168,6 +168,31 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
+//////////////////////////////// LOGIN AS ADMIN
+exports.loginAsAdmin = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // Check if email and password exists
+  if (!email || !password) {
+    return next(new AppError("please provide email and password", 400));
+  }
+
+  const admin = await User.findOne({ email: email, roles: "admin" }).select(
+    "+password"
+  );
+  if (!admin || !(await admin.correctPassword(password, admin.password))) {
+    return next(new AppError("Incorrect email or password", 401));
+  }
+
+  // if every thing is OK, send the token to the user
+  const token = signToken(admin._id);
+
+  res.status(200).json({
+    status: "success",
+    token,
+  });
+});
+
 //////////////////////////////// FORGOT PASSWORD
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // Get user from the email
@@ -184,13 +209,14 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // Send it to user email
   const message = `Forgot your Password? this is your reset toke please enter it ${resetToken}`;
-
+ 
   try {
     await sendEmail({
       email: user.email,
-      subject: "Your password resrt token (valid for 10 min)",
+      subject: "Your password reset token (valid for 10 min)",
       message,
     });
+  
     res.status(200).json({
       status: "success",
       message: "Token sent to email",

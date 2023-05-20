@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+router.post('/login-as-admin', authController.loginAsAdmin);
 
 router.post('/forgotPassword', authController.forgotPassword);
 router.get('/checkResetToken/:token', authController.checkTokenIfValid, authController.checkResetToken);

@@ -21,6 +21,25 @@ const sendEmail = async (options) => {
 
   // Send the email
   await transporter.sendMail(mailOptions);
+
+  // const transporter = nodemailer.createTransport({
+  //   service: "gmail",
+  //   host: "smtp.gmail.com",
+  //   port: 587,
+  //   secure: false,
+  //   auth: {
+  //     user: "zainakabbani@gmail.com",
+  //     pass: "zaina31802",
+  //   },
+  // });
+  // let mailDetails = {
+  //   from: "ZainaKabbani<hello@gmail.com>",
+  //   to: options.email,
+  //   subject: options.subject,
+  //   text: options.message,
+  // };
+
+  // await transporter.sendMail(mailDetails);
 };
 
 module.exports = sendEmail;
