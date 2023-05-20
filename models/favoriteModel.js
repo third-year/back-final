@@ -9,12 +9,17 @@ const favoriteSchema = mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Product",
   },
-  date: {
+  createdAt: {
     type: Date,
-    required: [true, "Please enter the data"],
-  },
+    default: Date.now
+  }
 });
 
+/*favoriteSchema.pre(/^findByIdAndDelete/, async function(next) {
+  this.r = await this.findByIdAndDelete();
+   //console.log(this.r);
+  next();
+});*/
 const Favorite = mongoose.model("Favorite", favoriteSchema);
 
 module.exports = Favorite;

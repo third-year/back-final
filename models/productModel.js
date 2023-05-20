@@ -50,10 +50,11 @@ const productSchema = mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-productSchema.virtual("readableAddress").get(function () {
-  // latitude/longitude
- // lookUpRaw(43.73828, 7.42542);
- return lookUpRaw(this.address[0], this.address[1]);
+// Virtual populate
+productSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'product',
+  localField: '_id'
 });
 productSchema.plugin(mongoosePaginate);
 const Product = mongoose.model("Product", productSchema);
