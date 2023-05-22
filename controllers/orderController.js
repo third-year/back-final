@@ -22,7 +22,7 @@ exports.getAllOrder = catchAsync(async(req,res,next)=>{
 exports.createOrders = catchAsync(async(req,res,next)=>{
 
 const newOrder = await Order.create(req.body);
-const quantity = await Product.populate('quantity',quantity-1);
+//const quantity = await Product.populate('quantity',quantity-1);
         
         res.status(201).json({
             status:"success",
