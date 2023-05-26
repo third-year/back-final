@@ -124,7 +124,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     fullName: Name,
     email: req.body.email,
-    image: req.body.imag,
+    image: req.body.image,
     roles: req.body.roles,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
@@ -209,14 +209,14 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // Send it to user email
   const message = `Forgot your Password? this is your reset toke please enter it ${resetToken}`;
- 
+
   try {
     await sendEmail({
       email: user.email,
       subject: "Your password reset token (valid for 10 min)",
       message,
     });
-  
+
     res.status(200).json({
       status: "success",
       message: "Token sent to email",
@@ -252,22 +252,20 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
 
   await user.save();
- 
-   res.status(200).json({
-     status: 'success',
-     massage: 'password reseted successfully'
-   })
-   next();
 
+  res.status(200).json({
+    status: "success",
+    massage: "password reseted successfully",
+  });
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get user from collection
-  const user = await User.findById(req.user.id).select('+password');
+  const user = await User.findById(req.user.id).select("+password");
 
   // 2) Check if POSTed current password is correct
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
-    return next(new AppError('Your current password is wrong.', 401));
+    return next(new AppError("Your current password is wrong.", 401));
   }
 
   // 3) If so, update password
@@ -278,6 +276,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   // 4) Log user in, send JWT
   res.status(200).json({
-    status: 'success'
+    status: "success",
   });
 });
