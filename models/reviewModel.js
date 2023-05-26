@@ -34,8 +34,8 @@ const reviewSchema = new mongoose.Schema(
 
 reviewSchema.pre(/^find/,function(next){
   this.populate({
-    path:"user",
-    select:"name imag"
+    path:'user',
+    select:'fullName imag'
   });
   next();
 });
@@ -75,11 +75,12 @@ reviewSchema.post('save', function() {
 
 // findByIdAndUpdate
 // findByIdAndDelete
-reviewSchema.pre(/^findOneAnd/, async function(next) {
+/*reviewSchema.pre(/^findOneAnd/, async function(next) {
   this.r = await this.findOne();
   // console.log(this.r);
   next();
-});
+});*/
+
 
 
 const Review = mongoose.model('Review', reviewSchema);

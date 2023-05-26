@@ -3,16 +3,6 @@ const AppError = require("./../utils/appError");
 const Review = require("./../models/reviewModel");
 
 
-//filter function
-const filterObj = (obj, ...allowedFields) => {
-    const newObj = {};
-    Object.keys(obj).forEach(el => {
-      if (allowedFields.includes(el)) newObj[el] = obj[el];
-    });
-    return newObj;
-  };
-
-
 exports.getAllReview= catchAsync(async(req,res,next)=>{
 let filter = {};
 if(req.params.productId) filter = {product:req.params.productId};
@@ -29,6 +19,8 @@ data:{
 
 
 exports.createReview = catchAsync(async(req,res,next)=>{
+  if(!req.body.product) req.body.product = req.params.productId;
+  if(!req.body.user) req.body.user = req.params.id;
 
 const newReview = await Review.create(req.body);
 
@@ -40,26 +32,41 @@ res.status(201).json({
 });
 });
 
-exports.updataReview = catchAsync(async (req, res, next) => {
-    const filteredBody = filterObj(req.body, 'review');
+exports.getReview = catchAsync(async (req, res, next) => {
+  const review = await Review.findById(req.params.id);
 
- const updataReview = await User.findByIdAndUpdate(req.review.id, filteredBody, {
-  new: true,
-  runValidators: true
+  if (!review) {
+    return next(new AppError("there is no review with this ID", 404));
+  }
+  
+  res.status(200).json({
+    status: "success",
+    data: { review },
+  });
 });
 
-    res.status(200).json({
-      status: "success",
-      data: review,
-    });
+exports.updataReview = catchAsync(async (req, res, next) => {
+  const review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
   });
-  
+  if(!review){
+    return new AppError('The Review not exists',404);
+  }
+  console.log(review);
+  res.status(200).json({
+    status: "success",
+    data: review,
+  });
+});
 
 exports.deleteReview = catchAsync(async (req, res, next) => {
-    await Review.findByIdAndDelete(req.params.id);
-  
-    res.status(204).json({
-      status: "success",
-      data: null,
-    });
+  const review = await Review.findByIdAndDelete(req.params.id);
+  if(!review){
+    return new AppError('The Review not exists',404);
+  }
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
 });
