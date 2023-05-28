@@ -1,6 +1,7 @@
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
+const { populate } = require('../models/favoriteModel');
 
 //filter function
 const filterObj = (obj, ...allowedFields) => {
@@ -25,6 +26,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     });
   });
 
+  
   //update profile
   exports.updateProfile =catchAsync(async (req, res, next) => {
     if (req.body.password || req.body.passwordConfirm) {

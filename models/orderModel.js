@@ -1,27 +1,37 @@
 const mongoose = require('mongoose');
-const User = require('./userModel');
-const Product = require('./productModel');
 
 const orderSchema = new mongoose.Schema({
-quantity:{
-type:Number
-},
-totallPrice:{
-    type:Number
-},
-userId: {
+  products: [
+    {
+      _id: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Product',
+        required: [true, 'An order must belong to a product.'],
+      },
+      name: {
+        type: String,
+      },
+      price: {
+        type: Number,
+        require: [true, 'A product must have a price.'],
+      },
+      quantity: {
+        type: Number,
+        required: [true, 'A product must have a quantity.'],
+        default: 1,
+      },
+    },
+  ],
+  user: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: 'User',
+    required: [true, 'A order must have a User Id.'],
   },
-  productId: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Product",
-  },
-distantionAdress:{
+ distantionAdress:{
     type:String,
     require:true
-},
-distant:{
+  },
+ distant:{
     type:Number
 }
 });
