@@ -1,12 +1,26 @@
 const mongoose = require('mongoose');
-const Review = require('./reviewModel');
-const Product = require('./productModel');
-const dateSchema = new mongoose.Schema({
 
-    buyDate:{
-        type:Date
-    },
+const dateSchema = new mongoose.Schema({
     productId:{
-        ref:Product
-    }       
+        ref:"Product",
+        required: [true, 'A date must belong to a product.'],
+
+    },
+    userId:{
+        ref:"User",
+        require:[true,'A date must belong to a User']
+    },
+    orderId:{
+        ref:"Order",
+        required: [true, 'A date must belong to am order.'],
+
+    },
+    buyDate:{
+        type:Date,
+        default: Date.now()
+    },
+    deliveryDate:{
+        type:Date
+    }
+    
 })
