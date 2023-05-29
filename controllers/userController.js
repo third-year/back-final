@@ -62,7 +62,7 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
 
 
 exports.getAllUsersForTheAdmin = catchAsync(async(req, res, next)=>{
-  const users = await User.find();
+  const users = await User.find({roles: 'user'});
 
   res.status(200).json({
     status: 'success',

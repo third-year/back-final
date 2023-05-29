@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 const userRouter = require('./routes/userRoute');
@@ -15,7 +16,10 @@ app.use(cors({
   methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
 }));
 
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.json());
+
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/product', productRouter);
 //app.use('/api/v1/review', reviewRouter);
