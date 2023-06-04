@@ -32,17 +32,26 @@ const productSchema = mongoose.Schema(
     ratingsAverage: {
       type: Number,
       default: 1,
-      min: [1, 'Rating must be above 1.0'],
-      max: [5, 'Rating must be below 5.0'],
-      set: val => Math.round(val * 10) / 10 // 4.666666, 46.6666, 47, 4.7
+      min: [1, "Rating must be above 1.0"],
+      max: [5, "Rating must be below 5.0"],
+      set: (val) => Math.round(val * 10) / 10, // 4.666666, 46.6666, 47, 4.7
     },
     ratingsQuantity: {
       type: Number,
-      default: 0
+      default: 0,
     },
     category: {
       type: String,
-      enum: ['furniture', 'accessories', 'food', 'clothes', 'shoes', 'books', 'gifts', 'technology'],
+      enum: [
+        "furniture",
+        "accessories",
+        "food",
+        "clothes",
+        "shoes",
+        "books",
+        "gifts",
+        "technology",
+      ],
       required: [true, "Enter the product categorie"],
     },
     status: {
@@ -58,11 +67,24 @@ const productSchema = mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// Virtual propreties
+productSchema.virtual("addressInWords").get(function () {
+  // latitude/longitude
+  const result = lookUpRaw(this.address[0], this.address[1]);
+  if (result) {
+    delete result["features"][0]["geometry"];
+
+    const country = result["features"][0]["properties"]["geonunit"];
+    const city = result["features"][0]["properties"]["name_en"];
+    return { country, city };
+  }
+});
+
 // Virtual populate
-productSchema.virtual('reviews', {
-  ref: 'Review',
-  foreignField: 'product',
-  localField: '_id'
+productSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "product",
+  localField: "_id",
 });
 productSchema.plugin(mongoosePaginate);
 const Product = mongoose.model("Product", productSchema);

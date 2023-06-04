@@ -3,6 +3,7 @@ const AppError = require("./../utils/appError");
 const APIFeatures = require("./../utils/apiFeatures");
 const Product = require("./../models/productModel");
 const Review = require("../models/reviewModel");
+const { compare } = require("bcryptjs");
 
 ////////////////////////// GET ALL PRODUCT
 exports.getAllProducts = catchAsync(async (req, res, next) => {
@@ -14,9 +15,14 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(Product.find(), req.query)
     .filter()
     .sort()
-    .limitFields()
-    .paginate(Product);
-  const products = await features.query;
+    .limitFields();
+
+  const featureResult = await features.query;
+
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 100;
+
+  const products = featureResult.slice((page - 1) * limit, page * limit);
 
   res.status(200).json({
     status: "success",
@@ -27,12 +33,12 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 
 ////////////////////////// GET PRODUCT
 exports.getProduct = catchAsync(async (req, res, next) => {
-  const product = await Product.findById(req.params.id).populate('reviews');
+  const product = await Product.findById(req.params.id).populate("reviews");
 
   if (!product) {
     return next(new AppError("there is no product with this ID", 404));
   }
-  
+
   res.status(200).json({
     status: "success",
     data: { product },
