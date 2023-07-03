@@ -2,6 +2,7 @@ const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const { populate } = require('../models/favoriteModel');
+const { response } = require('express');
 
 //filter function
 const filterObj = (obj, ...allowedFields) => {
@@ -11,6 +12,32 @@ const filterObj = (obj, ...allowedFields) => {
   });
   return newObj;
 };
+
+
+///getUser
+/*exports.getUser = catchAsync(async(req,res,next)=>{
+const token = req.headers.authorization;
+console.log(token);
+res.status(200).json({
+  status: 'success',
+  token
+});
+});*/
+exports.getUser = catchAsync(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({
+      status: 'fail',
+      message: 'No authorization header provided'
+    });
+  }
+  else{
+    res.status(200).json({
+      status: 'success',
+      authHeader
+    });
+  };
+});
 
 //getUsers
 exports.getAllUsers = catchAsync(async (req, res, next) => {
