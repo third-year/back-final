@@ -7,6 +7,7 @@ router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 router.post("/login-as-admin", authController.loginAsAdmin);
 
+router.get("/getUser",userController.getUser);
 router.get("/getAllUsers", userController.getAllUsers);
 router.post("/forgotPassword", authController.forgotPassword);
 router.get(
