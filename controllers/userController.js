@@ -1,7 +1,11 @@
-const User = require('./../models/userModel');
-const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/appError');
-const { populate } = require('../models/favoriteModel');
+
+const User = require("./../models/userModel");
+const catchAsync = require("./../utils/catchAsync");
+const emailSend = require("./../utils/email");
+const AppError = require("./../utils/appError");
+const { populate } = require("../models/favoriteModel");
+const { response } = require('express');
+
 
 //filter function
 const filterObj = (obj, ...allowedFields) => {
