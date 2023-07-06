@@ -4,6 +4,7 @@ const APIFeatures = require("./../utils/apiFeatures");
 const Product = require("./../models/productModel");
 const Review = require("../models/reviewModel");
 const { compare } = require("bcryptjs");
+const User = require("../models/userModel");
 
 ////////////////////////// GET ALL PRODUCT
 exports.getAllProducts = catchAsync(async (req, res, next) => {
@@ -86,5 +87,23 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
   res.status(204).json({
     status: "success",
     data: null,
+  });
+});
+
+////////////////////////// USER'S PRODUCTS
+exports.userProducts = catchAsync(async (req, res, next) => {
+  const userProducts = await Product.find({ userId: req.params.userId });
+
+  if (!userProducts) {
+    return next(
+      new AppError("There is no products for the user with this ID", 404)
+    );
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: userProducts.length,
+    user: req.user,
+    data: { userProducts },
   });
 });
