@@ -20,10 +20,13 @@ exports.getAllOrder = catchAsync(async(req,res,next)=>{
 
 ////create order
 exports.createOrders = catchAsync(async(req,res,next)=>{
-
-const newOrder = await Order.create(req.body);
-//const quantity = await Product.populate('quantity',quantity-1);
-        
+  
+const newOrder = await Order.create({
+  userId: req.user.userId,
+  productId:req.params.productId,
+  qunatitySell:req.body.qunatitySell,
+  distantionAdress:req.body.distantionAdress
+});
         res.status(201).json({
             status:"success",
             data:{
