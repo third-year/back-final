@@ -1,11 +1,9 @@
-
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const emailSend = require("./../utils/email");
 const AppError = require("./../utils/appError");
 const { populate } = require("../models/favoriteModel");
-const { response } = require('express');
-
+const { response } = require("express");
 
 //filter function
 const filterObj = (obj, ...allowedFields) => {
@@ -16,30 +14,34 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
+exports.profile = catchAsync(async (req, res, next) => {
+  const userId = req.user.id;
 
-///getUser
-/*exports.getUser = catchAsync(async(req,res,next)=>{
-const token = req.headers.authorization;
-console.log(token);
-res.status(200).json({
-  status: 'success',
-  token
+  const userInfo = await User.findById(userId);
+
+  if (!userInfo) {
+    return next(new AppError("There is no user with this id", 404));
+  }
+
+  res.status(200).json({
+    satuts: "success",
+    user: userInfo,
+  });
 });
-});*/
+
 exports.getUser = catchAsync(async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({
-      status: 'fail',
-      message: 'No authorization header provided'
+      status: "fail",
+      message: "No authorization header provided",
+    });
+  } else {
+    res.status(200).json({
+      status: "success",
+      authHeader,
     });
   }
-  else{
-    res.status(200).json({
-      status: 'success',
-      authHeader
-    });
-  };
 });
 
 //getUsers
@@ -136,4 +138,28 @@ exports.sendEmail = catchAsync(async (req, res, next) => {
       )
     );
   }
+});
+
+///////////////////////////////////////// CHARGE WALLET
+exports.chargeWallet = catchAsync(async (req, res, next) => {
+  // Get user
+  const user = await User.findById(req.user.id);
+  // Get the amount of money in the wallet of the user
+  const userWallet = user.wallet;
+  // Calculate the new amount
+  const wallet = userWallet + req.body.wallet;
+  // Update the wallet value
+  const userUpdated = await User.findByIdAndUpdate(
+    req.user.id,
+    {
+      wallet: wallet,
+    },
+    { new: true }
+  );
+
+  // Send the response
+  res.status(200).json({
+    status: "success",
+    updatedWallet: userUpdated,
+  });
 });

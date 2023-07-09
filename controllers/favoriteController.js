@@ -5,7 +5,7 @@ const Favorite = require("./../models/favoriteModel");
 //// GET ALL FAVORITE
 exports.getAllFavorite = catchAsync(async (req, res, next) => {
   let filter = {};
-if(req.params.userId) filter = {user:req.params.userId};
+  if (req.params.userId) filter = { user: req.params.userId };
   const favorites = await Favorite.find(filter);
 
   res.status(200).json({
@@ -19,20 +19,37 @@ if(req.params.userId) filter = {user:req.params.userId};
 
 /////ADD FAVORITE
 exports.createFavorite = catchAsync(async (req, res, next) => {
-  const newFavorite = await Favorite.create(req.body);
+  const favorite = await Favorite.findOne({
+    product: req.params.productId,
+    user: req.user.id,
+  });
+
+  if (favorite) {
+    return next(
+      new AppError("This product is already in your favorite list", 404)
+    );
+  }
+
+  const newFavorite = await Favorite.create({
+    product: req.params.productId,
+    user: req.user.id,
+  });
   res.status(201).json({
     status: "success",
     data: {
-      favorites: newFavorite,
+      favorite: newFavorite,
     },
   });
 });
 
 ////////////////////////// DELETE FAVORITE
 exports.deleteFavorite = catchAsync(async (req, res, next) => {
-  const favorite =await Favorite.findByIdAndDelete(req.params.id);
-  if(!favorite){
-    return new AppError('The Review not exists',404);
+  const favorite = await Favorite.findOneAndDelete({
+    product: req.params.productId,
+    user: req.user.id,
+  });
+  if (!favorite) {
+    return next(new AppError("The favorite not exists", 404));
   }
   res.status(204).json({
     status: "success",

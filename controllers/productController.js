@@ -3,9 +3,11 @@ const AppError = require("./../utils/appError");
 const APIFeatures = require("./../utils/apiFeatures");
 const Product = require("./../models/productModel");
 const Review = require("../models/reviewModel");
+const Favorite = require("../models/favoriteModel");
 const { compare } = require("bcryptjs");
 const User = require("../models/userModel");
-
+const { promisify } = require("util");
+const jwt = require("jsonwebtoken");
 ////////////////////////// GET ALL PRODUCT
 exports.getAllProducts = catchAsync(async (req, res, next) => {
   // const products = await Product.find().populate({
@@ -25,19 +27,82 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 
   const products = featureResult.slice((page - 1) * limit, page * limit);
 
+  let resultProducts = [];
+  if (!req.headers.authorization) {
+    for (let product of products) {
+      pro = product.toObject();
+
+      pro.isFav = false;
+      resultProducts.push(pro);
+    }
+  }
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    for (let product of products) {
+      const fav = await Favorite.find({
+        product: product.id,
+        user: decoded.id,
+      });
+      pro = product.toObject();
+      if (fav.length > 0) {
+        pro.isFav = true;
+        resultProducts.push(pro);
+        console.log(pro);
+      }
+      if (fav.length === 0) {
+        pro.isFav = false;
+        resultProducts.push(pro);
+      }
+    }
+  }
+
   res.status(200).json({
     status: "success",
-    results: products.length,
-    data: { products },
+    results: resultProducts.length,
+    data: { resultProducts },
   });
 });
 
 ////////////////////////// GET PRODUCT
 exports.getProduct = catchAsync(async (req, res, next) => {
-  const product = await Product.findById(req.params.id).populate("reviews");
+  let product = await Product.findById(req.params.id).populate("reviews");
 
   if (!product) {
     return next(new AppError("there is no product with this ID", 404));
+  }
+
+  if (!req.headers.authorization) {
+    product = product.toObject();
+
+    product.isFav = false;
+  }
+
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    const fav = await Favorite.find({
+      product: product.id,
+      user: decoded.id,
+    });
+    product = product.toObject();
+    if (fav.length > 0) {
+      product.isFav = true;
+    }
+    if (fav.length === 0) {
+      product.isFav = false;
+    }
   }
 
   res.status(200).json({

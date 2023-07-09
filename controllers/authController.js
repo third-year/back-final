@@ -17,34 +17,34 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
-    if (!token) {
-      return next(
-        new AppError("You are not logged in! please log in to get access", 401)
-      );
-    }
-
-    // Varification token
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-    // check if the user still exists
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
-      return next(
-        new AppError("The user belonging to this user is no longer exists", 401)
-      );
-    }
-
-    // Check if the user changed password after the token was issued
-    if (currentUser.changedPasswordAfter(decoded.iat)) {
-      return next(
-        new AppError("User recently changed password! Please login again", 401)
-      );
-    }
-
-    // Grant access to protected route
-    req.user = currentUser;
-    next();
   }
+  if (!token) {
+    return next(
+      new AppError("You are not logged in! please log in to get access", 401)
+    );
+  }
+
+  // Varification token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // check if the user still exists
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError("The user belonging to this user is no longer exists", 401)
+    );
+  }
+
+  // Check if the user changed password after the token was issued
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password! Please login again", 401)
+    );
+  }
+
+  // Grant access to protected route
+  req.user = currentUser;
+  next();
 });
 
 //////////////////////////////// The loged in user is the user who owns the info
@@ -212,7 +212,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   try {
     await sendEmail({
-      from: 'STARZ<admin@gmail.com>',
+      from: "STARZ<admin@gmail.com>",
       email: user.email,
       subject: "Your password reset token (valid for 10 min)",
       message,

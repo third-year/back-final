@@ -7,10 +7,16 @@ const router = express.Router();
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 router.post("/login-as-admin", authController.loginAsAdmin);
-
-router.get("/getUser",userController.getUser);
+router.get("/profile", authController.protect, userController.profile);
+router.get("/getUser", userController.getUser);
 router.get("/getAllUsers", userController.getAllUsers);
 router.post("/forgotPassword", authController.forgotPassword);
+router.post(
+  "/charge-wallet",
+  authController.protect,
+  authController.restrictTo("user"),
+  userController.chargeWallet
+);
 router.get(
   "/checkResetToken/:token",
   authController.checkTokenIfValid,

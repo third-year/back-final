@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   },
   roles: {
     type: String,
-    enum: ["user", "admin"],
+    enum: ["user", "admin", "delivery"],
     default: "user",
   },
   password: {
@@ -45,16 +45,28 @@ const userSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
-
+  wallet: {
+    type: Number,
+    required: checkIfWalletRequired,
+  },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
-  active:{
-    type:Boolean,
-    default:true,
-    select:false
-  }
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
+
+function checkIfWalletRequired() {
+  if (this.roles === "user") {
+    this.wallet = 0;
+    return true;
+  }
+
+  return false;
+}
 
 userSchema.pre("save", async function (next) {
   // Only run if the password is modified
@@ -75,7 +87,7 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-userSchema.pre(/^find/, function(next) {
+userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
   next();
 });
