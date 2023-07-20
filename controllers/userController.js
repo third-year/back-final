@@ -146,8 +146,10 @@ exports.chargeWallet = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   // Get the amount of money in the wallet of the user
   const userWallet = user.wallet;
+  console.log(userWallet)
   // Calculate the new amount
   const wallet = userWallet + req.body.wallet;
+  console.log(wallet)
   // Update the wallet value
   const userUpdated = await User.findByIdAndUpdate(
     req.user.id,
