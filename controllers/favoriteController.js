@@ -4,9 +4,7 @@ const Favorite = require("./../models/favoriteModel");
 
 //// GET ALL FAVORITE
 exports.getAllFavorite = catchAsync(async (req, res, next) => {
-  let filter = {};
-  if (req.params.userId) filter = { user: req.params.userId };
-  const favorites = await Favorite.find(filter);
+  const favorites = await Favorite.find({ user: req.user.id }).populate('product');
 
   res.status(200).json({
     satuts: "success",

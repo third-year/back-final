@@ -6,7 +6,7 @@ const router = express.Router();
 //const router = express.Router({mergeParams:true});
 
 router
-  .route("/:userId")
+  .route("/")
   .get(authController.protect, favoriteController.getAllFavorite);
 
 router
