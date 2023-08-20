@@ -74,7 +74,7 @@ exports.restrictTo = (...roles) => {
         new AppError("You do not have permission to perform this action", 403)
       );
     }
-
+  
     next();
   };
 };
@@ -278,5 +278,26 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // 4) Log user in, send JWT
   res.status(200).json({
     status: "success",
+  });
+});
+
+exports.registerDeliveryMan = catchAsync(async (req, res, next) => {
+  const findOneEmail = await User.findOne({ email: req.body.email });
+  if (findOneEmail) {
+    return next(new AppError("This email already used", 404));
+  }
+
+  const newDeliveryMan = await User.create({
+    fullName: req.body.fullName,
+    email: req.body.email,
+    roles: "delivery",
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm,
+    phone: req.body.phone,
+  });
+
+  res.status(201).json({
+    status: "success",
+    data: newDeliveryMan,
   });
 });

@@ -15,7 +15,10 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
   //   select: "-__v",
   // });
 
-  const features = new APIFeatures(Product.find(), req.query)
+  const features = new APIFeatures(
+    Product.find({ quantity: { $gt: 0 } }),
+    req.query
+  )
     .filter()
     .sort()
     .limitFields();

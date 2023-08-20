@@ -10,7 +10,7 @@ router.route('/')
 router.route('/:id')
 .patch(authController.protect,authController.restrictTo('user',reviewController.updataReview))
 .get(reviewController.getReview)
-.delete(authController.protect,authController.restrictTo('user'),reviewController.deleteReview);
+.delete(authController.protect,authController.restrictTo('user', 'admin'),reviewController.deleteReview);
 
 
 

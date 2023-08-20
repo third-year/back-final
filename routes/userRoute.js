@@ -10,6 +10,21 @@ router.post("/login-as-admin", authController.loginAsAdmin);
 router.get("/profile", authController.protect, userController.profile);
 router.get("/getUser", userController.getUser);
 router.get("/getAllUsers", userController.getAllUsers);
+
+router.post(
+  "/register-delivery-man",
+  authController.protect,
+  authController.restrictTo("admin"),
+  authController.registerDeliveryMan
+);
+
+router.get(
+  "/delivery-men",
+  authController.protect,
+  authController.restrictTo("admin"),
+  userController.getDeliveryMen
+);
+
 router.post("/forgotPassword", authController.forgotPassword);
 router.post(
   "/charge-wallet",
@@ -55,6 +70,20 @@ router.post(
   authController.protect,
   authController.restrictTo("admin"),
   userController.sendEmail
+);
+
+router.delete(
+  "/delete-user/:userId",
+  authController.protect,
+  authController.restrictTo("admin"),
+  userController.deleteUserForTheAdmin
+);
+
+router.patch(
+  "/update-user/:userId",
+  authController.protect,
+  authController.restrictTo("admin"),
+  userController.updateUserForTheAdmin
 );
 
 module.exports = router;

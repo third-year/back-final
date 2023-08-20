@@ -146,10 +146,10 @@ exports.chargeWallet = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   // Get the amount of money in the wallet of the user
   const userWallet = user.wallet;
-  console.log(userWallet)
+  console.log(userWallet);
   // Calculate the new amount
   const wallet = userWallet + req.body.wallet;
-  console.log(wallet)
+  console.log(wallet);
   // Update the wallet value
   const userUpdated = await User.findByIdAndUpdate(
     req.user.id,
@@ -163,5 +163,40 @@ exports.chargeWallet = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     updatedWallet: userUpdated,
+  });
+});
+
+exports.getDeliveryMen = catchAsync(async (req, res, next) => {
+  const deliveryMen = await User.find({ roles: "delivery" });
+
+  res.status(200).json({
+    status: "success",
+    results: deliveryMen.length,
+    data: deliveryMen,
+  });
+});
+
+exports.deleteUserForTheAdmin = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.params.userId, { active: false });
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
+});
+
+exports.updateUserForTheAdmin = catchAsync(async (req, res, next) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.userId,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: updatedUser,
   });
 });

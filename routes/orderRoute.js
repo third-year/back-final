@@ -11,21 +11,6 @@ router
     authController.restrictTo("user"),
     orderController.createOrders
   );
-router
-  .route("/:productId")
-  .post(
-    authController.protect,
-    authController.restrictTo("user"),
-    orderController.createOrders
-  );
-
-router.get(
-  "/my-orders",
-  authController.protect,
-  authController.restrictTo("user"),
-  orderController.myOrders
-);
-
 router.get(
   "/others-orders-from-me",
   authController.protect,
@@ -39,5 +24,21 @@ router.get(
   authController.restrictTo("delivery"),
   orderController.notDeliveredOrders
 );
+router.get(
+  "/my-orders",
+  authController.protect,
+  authController.restrictTo("user"),
+  orderController.myOrders
+);
+
+router.route("/:orderId").get(authController.protect, orderController.getOrder);
+
+router
+  .route("/:productId")
+  .post(
+    authController.protect,
+    authController.restrictTo("user"),
+    orderController.createOrders
+  );
 
 module.exports = router;

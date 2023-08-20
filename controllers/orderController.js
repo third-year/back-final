@@ -4,12 +4,12 @@ const AppError = require("./../utils/appError");
 const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const Bank = require("../models/bankModel");
-
+const Delivery = require("../models/deliveryModel");
 const geolib = require("geolib");
 
 //// GET ALL ORDER
 exports.getAllOrder = catchAsync(async (req, res, next) => {
-  const orders = await Order.find();
+  const orders = await Order.find().populate("product").populate("orderOwner");
 
   res.status(200).json({
     satuts: "success",
@@ -17,6 +17,22 @@ exports.getAllOrder = catchAsync(async (req, res, next) => {
     data: {
       orders,
     },
+  });
+});
+
+exports.getOrder = catchAsync(async (req, res, next) => {
+  const order = await Order.findById(req.params.orderId)
+    .populate("product")
+    .populate("orderOwner");
+
+  const deliveryManForThisOrder = await Delivery.find({
+    order: req.params.orderId,
+  }).populate("deliveryMan");
+
+  res.status(200).json({
+    status: "success",
+    order: order,
+    deliveryMan: deliveryManForThisOrder,
   });
 });
 
@@ -91,7 +107,9 @@ exports.createOrders = catchAsync(async (req, res, next) => {
   });
 
   const productOwner = await User.findById(productOwnerId);
+
   const productOwnerNewWallet = productOwner.wallet + totalPrice;
+
   const orderOwnerNewWallet = orderOwner.wallet - totalPrice;
 
   const updateProductOwnerWallet = await User.findByIdAndUpdate(
@@ -102,7 +120,18 @@ exports.createOrders = catchAsync(async (req, res, next) => {
       runValidators: false,
     }
   );
-
+  console.log("9");
+  await Product.findByIdAndUpdate(
+    req.params.productId,
+    {
+      quantity: productQuantity - orderQuantity,
+    },
+    {
+      new: true,
+      runValidators: false,
+    }
+  );
+  console.log("10");
   const updateOrderOwnerWallet = await User.findByIdAndUpdate(
     orderOwnerId,
     { wallet: orderOwnerNewWallet },
