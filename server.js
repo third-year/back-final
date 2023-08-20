@@ -11,7 +11,7 @@ const DB = process.env.DATABASE.replace(
 );
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/e_commerce_system")
+  .connect("mongodb://127.0.0.1:27017/final_e_commerce_system")
   .then(console.log("connected successfully"))
   .catch((err) => console.log(err));
 
