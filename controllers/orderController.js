@@ -120,7 +120,7 @@ exports.createOrders = catchAsync(async (req, res, next) => {
       runValidators: false,
     }
   );
-  console.log("9");
+
   await Product.findByIdAndUpdate(
     req.params.productId,
     {
@@ -131,7 +131,7 @@ exports.createOrders = catchAsync(async (req, res, next) => {
       runValidators: false,
     }
   );
-  console.log("10");
+
   const updateOrderOwnerWallet = await User.findByIdAndUpdate(
     orderOwnerId,
     { wallet: orderOwnerNewWallet },
